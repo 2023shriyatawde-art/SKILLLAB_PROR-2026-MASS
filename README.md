@@ -55,7 +55,7 @@ By the final review, this README should clearly show:
 
 # 1. Team Identity
 
-## 1.1 Studio / Group Name
+## 1.1 Group Name - MASS
 
 `Project^2`
 
@@ -63,20 +63,22 @@ By the final review, this README should clearly show:
 
 | Name                  | Primary Role                    | Secondary Role   | Strengths Brought to the Project |
 | --------------        | ------------------------------- | --------------   | -------------------------------- |
-| `Mrugendra Vasmatkar` | `[Electronics / Coding / App ]` | `Documentation`  | `Documentation, Gift of Gab `|
-| `Jyoti Bagate`        | `[Electronics / Fabrication]`   | `[Coding]`       | `Material Handling, Hardware`    |
+| ARYAMAAN PATRA      ` | `[Electronics / Coding / App ]` | `Documentation`  | `Documentation, Gift of Gab `    |
+| MITESH CHAURASIYA     | `[Electronics / Fabrication]`   | `[Coding]`       | `Material Handling, Hardware`    |
+| SATVIK BHUSA          | `[Electronics / Coding / App ]` | `Documentation`  | `Documentation, Gift of Gab `    |
+| SHRIYA TAWDE          | `[Electronics / Fabrication]`   | `Documentation   |  Documentation, Gift of Gab      |
 
 ## 1.3 Project Title
 
-`"Project Project"`
+Virtual Mouse
 
-`(because Project-or)`
+The project implements a computer vision-based system that enables mouse control through hand gestures, eliminating the need for a physical mouse.
 
 <img width="1600" height="1131" alt="image" src="https://github.com/user-attachments/assets/c64bfbd4-b3b7-43d9-83ad-c203a5aa11bc" />
 
 ## 1.4 One-Line Pitch
 
-`A projected, fully customizable time portal where engineering education is done through PUBG battlefield in the comfort of our home`
+`A vision-based virtual mouse system that uses hand gestures to enable intuitive and contactless human-computer interaction.
 
 ## 1.5 Expanded Project Idea
 
@@ -87,7 +89,9 @@ In 1–2 paragraphs, explain:
 - what technologies are involved.
 
 **Response:**  
-`A projected and fully customizable time portal can transform engineering education into an immersive PUBG-style battlefield experience from the comfort of home. In this environment, students can learn engineering concepts by entering a virtual battlefield where challenges, obstacles, and missions are designed around real technical problems. Instead of passively studying theory, learners actively apply concepts such as electronics, coding, sensors, robotics, mechanics, and system design to complete missions, solve problems, and progress through different levels. This approach makes engineering education more interactive, engaging, and practical by combining gaming, simulation, and hands-on problem-solving in a familiar and exciting format.`
+The project is an interactive projection-based system that integrates real-time object tracking, gesture recognition, and a physical robotic platform to create a hybrid physical-digital environment. A robotic car operates within a projected space where elements such as obstacles, paths, and targets are dynamically displayed using projection mapping. A camera continuously tracks the position and orientation of the car, and this data is processed in real time to update the projected environment accordingly, ensuring synchronization between physical movement and digital feedback. The system is controlled using a Raspberry Pi 4 Model B, which manages processing, communication, and hardware control.
+
+The system is designed to deliver an immersive and engaging user experience by allowing interaction with a virtual, game-like environment through physical actions. Users control and navigate the car through projected challenges, effectively blending gameplay with real-world interaction. The implementation involves computer vision techniques using OpenCV for tracking, microcontroller-based motor control through drivers, wireless communication for command transfer, and projection systems for visual output. This combination of technologies enables a seamless interaction between the digital and physical domains.
 
 ---
 
@@ -97,39 +101,47 @@ In 1–2 paragraphs, explain:
 
 List what inspired the project.
 
-| Source Type | Title / Link                                                        | What Inspired You                                                                         |
-| ----------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `[Video]`   | `https://www.instagram.com/reel/DW4CT7WCDry/?igsh=cXg3dzAxYmdncDBo` | `How projection mapping can be used to create interactive digital + physical experiences` |
-|             |                                                                     |                                                                                           |
-|             |                                                                     |                                                                                           |
+| Source Type |                           Link                                   | What Inspired You              |
+| ----------- | --------------------------------------------------------------   |--------------------------------|
+| [Video]     | https://youtu.be/ufm6tfgo-OA?si=yGRgK6GDuQBSjQ1w                 | Projection mapping interaction |
+| [Video]     | https://www.instagram.com/reel/DXdhxdVgNgG/?igsh=b2c5a3B6c2hlM3dp| Immersive visual environments  |
+| [Video]     | https://youtu.be/s7S4vco6bUk?si=OlaKAmpLrod_cQva                 | Real-time object tracking      |
+| [Article]   | https://ieeexplore.ieee.org/document/10060367                    | Image processing basics        |
+| [Project]   | https://www.geeksforgeeks.org/computer-vision/ai-virtual-mouse/  | Wireless hardware control      |
+
 
 ## 2.2 Original Twist
 
-What makes your project original?
+**Response:**
+The originality of this project lies in the integration of projection mapping, real-time object tracking, and gesture-based interaction into a unified hybrid system. Unlike conventional projection systems that are passive or limited to touch interaction, this project introduces both a physical robotic platform and a vision-based gesture interface, enabling users to interact with the system through multiple input modalities.
 
-**Response:**  
+In addition to controlling a robotic car within a dynamically projected environment, the system incorporates a hand gesture-based Rock–Paper–Scissors game using computer vision. This extends the interaction beyond navigation to include intuitive, contactless gameplay, demonstrating the system’s flexibility in supporting different types of user experiences within the same framework.
 
+The combination of physical movement, gesture recognition, and real-time visual feedback creates a seamless connection between the digital and physical domains. By integrating computer vision, embedded systems, and interactive design, the project offers a novel and immersive approach that goes beyond traditional screen-based or single-mode interaction systems.
 
 ---
 
 # 3. Project Intent
 
-## 3.1 User Journey 
+## 3.1 User Journey
 
-Describe exactly how a user will use the project.Make it a story
-**Response:**  
+The user interacts with the system in a controlled environment where a projector displays an interactive interface on a flat surface. Once the system is started, a camera captures input and the projected interface becomes active.
 
-                                                  |
+The user provides input either through a control interface or through hand gestures. The system processes these inputs in real time and updates the projected visuals accordingly. The user observes the changes on the projection and adjusts their input to interact with different elements displayed on the surface.
 
+In a separate interaction mode, the user places their hand in front of the camera to perform gestures for a Rock–Paper–Scissors game. The system detects the gesture using computer vision techniques and displays the result immediately.
 
-
+Overall, the user experiences a responsive system that allows interaction through simple inputs, with real-time visual feedback provided through projection.
+                                                
 ---
 
 # 4. Definition of Success
 
 ## 4.1 Definition of “Usable”
 
+The system is considered usable if it responds reliably and accurately to user inputs, including control commands and hand gestures, with minimal delay. The projected interface should update in real time and clearly reflect the system’s state, allowing the user to understand and interact with it without confusion.
 
+Additionally, the system should operate consistently under normal conditions, with stable camera tracking, smooth processing, and clear visual output. A usable system should not require repeated attempts for input recognition and should provide predictable and understandable feedback to the user during interaction.
 
 ## 4.2 Minimum Usable Version
 
@@ -137,13 +149,16 @@ What is the smallest version of this project that still delivers the core experi
 
 **Response:**  
 
+The minimum usable version of the project consists of a working system where the camera can detect and process user input, and the projector displays a basic interactive interface. The system should be able to respond to at least one form of input, either through a control interface or hand gestures, and provide real-time visual feedback on the projection.
+
+At a basic level, the system should support simple interaction such as detecting a gesture and displaying a corresponding output, or allowing the user to interact with a projected element in a predictable way. The Rock–Paper–Scissors gesture module can serve as the core interaction in this version, where the system detects hand gestures and displays the result accurately.
+
+This minimal setup ensures that the core concept of real-time interaction between user input and projected output is demonstrated, even without advanced features or multiple interaction modes.
+
 
 ## 4.3 Stretch Features
 
-What features are nice to have but not essential?
-
-
----
+-Rock Papers Scissors Game
 
 # 5. System Overview
 
@@ -151,27 +166,27 @@ What features are nice to have but not essential?
 
 Check all that apply.
 
-- [x] Electronics-based
+- [✅] Electronics-based
 
 - [ ] Mechanical
 
-- [x] Sensor-based
+- [ ] Sensor-based
 
-- [x] App-connected
+- [ ] App-connected
 
-- [x] Motorized
+- [ ] Motorized
 
 - [ ] Sound-based
 
-- [x] Light-based
+- [ ] Light-based
 
-- [x] Screen/UI-based
+- [✅] Screen/UI-based
 
-- [x] Fabricated structure
+- [ ] Fabricated structure
 
-- [x] Game logic based
+- [✅] Game logic based
 
-- [x] Installation
+- [ ] Installation
 
 - [ ] Other:
 
