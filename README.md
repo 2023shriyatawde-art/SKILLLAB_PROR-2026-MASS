@@ -61,12 +61,12 @@ By the final review, this README should clearly show:
 
 ## 1.2 Team Members
 
-| Name                  | Primary Role                    | Secondary Role   | Strengths Brought to the Project |
-| --------------        | ------------------------------- | --------------   | -------------------------------- |
-| ARYAMAAN PATRA      ` | `[Electronics / Coding / App ]` | `Documentation`  | `Documentation, Gift of Gab `    |
-| MITESH CHAURASIYA     | `[Electronics / Fabrication]`   | `[Coding]`       | `Material Handling, Hardware`    |
-| SATVIK BHUSA          | `[Electronics / Coding / App ]` | `Documentation`  | `Documentation, Gift of Gab `    |
-| SHRIYA TAWDE          | `[Electronics / Fabrication]`   | `Documentation   |  Documentation, Gift of Gab      |
+| Name               | Primary Role                 | Secondary Role   | Strengths Brought to the Project        |
+| ------------------ | ---------------------------- | ---------------- | --------------------------------------- |
+| Aryamaan Patra     | System Coordination / Coding | Setup            | Technical support, Coordination         |
+| Mitesh Chaurasiya  | Coding / Integration         | Testing          | Technical support, Debugging            |
+| Satvik Bhusa       | Coding / Integration         | Testing          | System Planning, Debugging              |
+| Shriya Tawde       | Documentation                | System Design    | Clear Documentation, System Planning    |
 
 ## 1.3 Project Title
 
