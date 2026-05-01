@@ -1,1 +1,779 @@
 Insert your documented code here
+
+#main.py
+
+
+Conversations
+ 
+Program Policies
+Powered by Google
+Last account activity: 12 hours ago
+Details
+import cv2
+import mediapipe as mp
+import numpy as np
+import time
+import subprocess
+from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Key, Controller as KeyboardController
+from gesture_recognizer import GestureRecognizer
+
+# ─── CONFIG ───────────────────────────────────────────────
+SCREEN_W, SCREEN_H = 1920, 1080  # change to match your VNC resolution
+CAM_W, CAM_H       = 640, 480
+SMOOTH              = 5
+FRAME_REDUCTION     = 80
+
+mouse    = MouseController()
+keyboard = KeyboardController()
+
+# ─── MODES ────────────────────────────────────────────────
+MODES = {
+    "MOUSE":     ("Virtual Mouse",      (255, 200,   0)),
+    "MEDIA":     ("Media Control",      (  0, 200, 255)),
+    "APPLIANCE": ("Appliance Control",  (  0, 255, 100)),
+    "SOS":       ("EMERGENCY SOS",      (  0,   0, 255)),
+    "IDLE":      ("Idle",               (180, 180, 180)),
+}
+
+# ─── MEDIAPIPE SETUP ──────────────────────────────────────
+mp_hands = mp.solutions.hands
+mp_draw  = mp.solutions.drawing_utils
+hands    = mp_hands.Hands(
+    static_image_mode=False,
+    max_num_hands=1,
+    min_detection_confidence=0.8,
+    min_tracking_confidence=0.8
+)
+
+recognizer = GestureRecognizer()
+
+# ─── STATE ────────────────────────────────────────────────
+mode             = "IDLE"
+smooth_x         = [0] * SMOOTH
+smooth_y         = [0] * SMOOTH
+click_cooldown   = 0
+mode_cooldown    = 0
+gesture_lock     = 0
+sos_triggered    = False
+appliance_states = {"LIGHT": False, "FAN": False}
+
+# ─── HELPERS ──────────────────────────────────────────────
+def speak(text):
+    subprocess.Popen(
+        ["espeak", text],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+def trigger_sos():
+    global sos_triggered
+    if not sos_triggered:
+        sos_triggered = True
+        speak("Emergency SOS triggered. Help is needed.")
+        print("SOS TRIGGERED!")
+
+def toggle_appliance(name):
+    appliance_states[name] = not appliance_states[name]
+    state = "ON" if appliance_states[name] else "OFF"
+    speak(f"{name} turned {state}")
+    print(f"{name}: {state}")
+
+def get_landmarks(hand_landmarks, w, h):
+    return [
+        (int(lm.x * w), int(lm.y * h))
+        for lm in hand_landmarks.landmark
+    ]
+
+def draw_ui(frame, gesture, mode):
+    name, color = MODES[mode]
+    cv2.rectangle(frame, (0, 0), (CAM_W, 50), (30, 30, 30), -1)
+    cv2.putText(frame, f"Mode: {name}", (10, 32),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+    cv2.putText(frame, f"Gesture: {gesture}", (10, CAM_H - 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    light_str = "ON" if appliance_states["LIGHT"] else "OFF"
+    fan_str   = "ON" if appliance_states["FAN"]   else "OFF"
+    cv2.putText(frame, f"Light:{light_str}  Fan:{fan_str}",
+                (CAM_W - 220, 32),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+
+# ─── MAIN LOOP ────────────────────────────────────────────
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,  CAM_W)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_H)
+cap.set(cv2.CAP_PROP_FPS, 30)
+
+print("GestureFlow started. Press Q to quit.")
+print("OPEN PALM     -> Virtual Mouse")
+print("PEACE         -> Media Control")
+print("THUMB+INDEX   -> Appliance Control")
+print("SPIDERMAN     -> Emergency SOS")
+print("FIST          -> Idle")
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    frame   = cv2.flip(frame, 1)
+    rgb     = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = hands.process(rgb)
+    gesture = "NONE"
+    now     = time.time()
+
+    if results.multi_hand_landmarks:
+        hand_lms = results.multi_hand_landmarks[0]
+        mp_draw.draw_landmarks(frame, hand_lms, mp_hands.HAND_CONNECTIONS)
+        lm      = get_landmarks(hand_lms, CAM_W, CAM_H)
+        gesture = recognizer.recognize(lm)
+
+        # ── Mode Switching ───────────────────────────────────
+        if now > mode_cooldown:
+            if gesture == "OPEN_PALM":
+                mode          = "MOUSE"
+                mode_cooldown = now + 1.5
+                sos_triggered = False
+            elif gesture == "PEACE" and mode != "MOUSE":
+                mode          = "MEDIA"
+                mode_cooldown = now + 1.5
+            elif gesture == "THUMBS_INDEX":
+                mode          = "APPLIANCE"
+                mode_cooldown = now + 1.5
+            elif gesture == "SPIDERMAN":
+                mode          = "SOS"
+                mode_cooldown = now + 1.5
+            elif gesture == "FIST":
+                mode          = "IDLE"
+                mode_cooldown = now + 1.0
+
+        # ── Virtual Mouse ────────────────────────────────────
+        if mode == "MOUSE":
+            ix, iy = lm[8]
+            tx = np.interp(ix, [FRAME_REDUCTION, CAM_W - FRAME_REDUCTION],
+                           [0, SCREEN_W])
+            ty = np.interp(iy, [FRAME_REDUCTION, CAM_H - FRAME_REDUCTION],
+                           [0, SCREEN_H])
+            smooth_x.append(tx); smooth_x.pop(0)
+            smooth_y.append(ty); smooth_y.pop(0)
+            sx = int(sum(smooth_x) / SMOOTH)
+            sy = int(sum(smooth_y) / SMOOTH)
+            mouse.position = (sx, sy)
+
+            if gesture == "PINCH" and now > click_cooldown:
+                mouse.click(Button.left)
+                click_cooldown = now + 0.4
+
+            if gesture == "TWO_PINCH" and now > click_cooldown:
+                mouse.click(Button.right)
+                click_cooldown = now + 0.6
+
+            cv2.circle(frame, (ix, iy), 10, (255, 200, 0), cv2.FILLED)
+
+        # ── Media Control ────────────────────────────────────
+        elif mode == "MEDIA" and now > gesture_lock:
+            if gesture == "OPEN_PALM":
+                keyboard.press(Key.media_play_pause)
+                keyboard.release(Key.media_play_pause)
+                gesture_lock = now + 0.8
+                speak("play pause")
+            elif gesture == "PINKY":
+                keyboard.press(Key.media_next)
+                keyboard.release(Key.media_next)
+                gesture_lock = now + 0.8
+                speak("next")
+            elif gesture == "THUMB_ONLY":
+                keyboard.press(Key.media_previous)
+                keyboard.release(Key.media_previous)
+                gesture_lock = now + 0.8
+                speak("previous")
+            elif gesture == "POINTING":
+                keyboard.press(Key.media_volume_up)
+                keyboard.release(Key.media_volume_up)
+                gesture_lock = now + 0.3
+            elif gesture == "FIST":
+                keyboard.press(Key.media_volume_down)
+                keyboard.release(Key.media_volume_down)
+                gesture_lock = now + 0.3
+
+        # ── Appliance Control ────────────────────────────────
+        elif mode == "APPLIANCE" and now > gesture_lock:
+            if gesture == "POINTING":
+                toggle_appliance("LIGHT")
+                gesture_lock = now + 1.0
+            elif gesture == "PINKY":
+                toggle_appliance("FAN")
+                gesture_lock = now + 1.0
+
+        # ── Emergency SOS ────────────────────────────────────
+        elif mode == "SOS":
+            trigger_sos()
+            cv2.rectangle(frame, (0, 0), (CAM_W, CAM_H), (0, 0, 255), 8)
+
+    else:
+        if mode != "IDLE" and now > mode_cooldown + 3:
+            mode = "IDLE"
+
+    draw_ui(frame, gesture, mode)
+    cv2.imshow("GestureFlow", frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+print("GestureFlow stopped.")
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#virtuall_mousee.py
+import cv2
+import pyautogui
+import mediapipe as mp
+from mediapipe.tasks import python as mp_python
+from mediapipe.tasks.python import vision
+from mediapipe.tasks.python.vision import HandLandmarkerOptions
+import urllib.request
+import math
+import time
+import os
+
+pyautogui.FAILSAFE = False
+
+SMOOTHING        = 5
+SENSITIVITY      = 1.2
+
+# --- Click tuning ---
+PINCH_CLICK_DIST    = 40    # pixels (on 640x480 frame) — thumb & index must be closer than this to click
+PINCH_RELEASE_DIST  = 55    # pixels — must open wider than this before next click is allowed
+CLICK_COOLDOWN      = 0.35  # seconds between clicks (prevents rapid-fire)
+
+# Download model file on first run (~9 MB)
+MODEL_PATH = "hand_landmarker.task"
+MODEL_URL  = "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task"
+
+if not os.path.exists(MODEL_PATH):
+    print("Downloading hand model (~9 MB, one time only)...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+    print("Download done!")
+
+# Setup hand landmarker
+base_options = mp_python.BaseOptions(model_asset_path=MODEL_PATH)
+options = HandLandmarkerOptions(
+    base_options=base_options,
+    num_hands=1,
+    min_hand_detection_confidence=0.7,
+    min_hand_presence_confidence=0.7,
+    min_tracking_confidence=0.7,
+    running_mode=vision.RunningMode.IMAGE,
+)
+landmarker = vision.HandLandmarker.create_from_options(options)
+
+HAND_CONNECTIONS = [
+    (0,1),(1,2),(2,3),(3,4),
+    (0,5),(5,6),(6,7),(7,8),
+    (0,9),(9,10),(10,11),(11,12),
+    (0,13),(13,14),(14,15),(15,16),
+    (0,17),(17,18),(18,19),(19,20),
+    (5,9),(9,13),(13,17),
+]
+
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH,  640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+screen_w, screen_h = pyautogui.size()
+prev_x_list = []
+prev_y_list = []
+
+# Click state
+pinch_active   = False   # True while thumb+index are pinched
+last_click_time = 0.0
+
+print("Virtual Mouse started!")
+print("  Move  → point with index finger")
+print("  Click → pinch thumb + index finger together")
+print("  Press Q to quit.")
+
+while True:
+    ok, frame = cap.read()
+    if not ok:
+        print("Cannot read webcam.")
+        break
+
+    frame = cv2.flip(frame, 1)
+    frame_h, frame_w, _ = frame.shape
+
+    rgb    = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+    result = landmarker.detect(mp_img)
+
+    if result.hand_landmarks:
+        landmarks = result.hand_landmarks[0]
+
+        # Draw skeleton
+        for a, b in HAND_CONNECTIONS:
+            x1 = int(landmarks[a].x * frame_w)
+            y1 = int(landmarks[a].y * frame_h)
+            x2 = int(landmarks[b].x * frame_w)
+            y2 = int(landmarks[b].y * frame_h)
+            cv2.line(frame, (x1, y1), (x2, y2), (0, 200, 255), 2)
+
+        for lm in landmarks:
+            cx = int(lm.x * frame_w)
+            cy = int(lm.y * frame_h)
+            cv2.circle(frame, (cx, cy), 4, (255, 255, 255), cv2.FILLED)
+
+        # Landmark 8 = index tip, landmark 4 = thumb tip
+        index_tip = landmarks[8]
+        thumb_tip  = landmarks[4]
+
+        finger_x = int(index_tip.x * frame_w)
+        finger_y = int(index_tip.y * frame_h)
+        thumb_x  = int(thumb_tip.x  * frame_w)
+        thumb_y  = int(thumb_tip.y  * frame_h)
+
+        # Euclidean distance between thumb and index tip (in frame pixels)
+        pinch_dist = math.hypot(finger_x - thumb_x, finger_y - thumb_y)
+
+        # ── Click logic ──────────────────────────────────────────────
+        now = time.time()
+        if pinch_dist < PINCH_CLICK_DIST and not pinch_active:
+            if now - last_click_time > CLICK_COOLDOWN:
+                pyautogui.click()
+                last_click_time = now
+                pinch_active = True
+                print(f"[CLICK] pinch_dist={pinch_dist:.1f}px")
+        elif pinch_dist > PINCH_RELEASE_DIST:
+            pinch_active = False          # reset so next pinch can fire
+        # ─────────────────────────────────────────────────────────────
+
+        # Visual feedback
+        dot_color = (0, 0, 255) if pinch_active else (0, 255, 0)
+        cv2.circle(frame, (finger_x, finger_y), 12, dot_color, cv2.FILLED)
+        cv2.circle(frame, (finger_x, finger_y), 12, (255, 255, 255), 2)
+        cv2.circle(frame, (thumb_x,  thumb_y),  10, dot_color, cv2.FILLED)
+        cv2.circle(frame, (thumb_x,  thumb_y),  10, (255, 255, 255), 2)
+        # Line between thumb and index shows pinch proximity
+        line_color = (0, 0, 255) if pinch_active else (200, 200, 200)
+        cv2.line(frame, (thumb_x, thumb_y), (finger_x, finger_y), line_color, 2)
+
+        # Map index tip → screen coordinates
+        target_x = int(index_tip.x * screen_w * SENSITIVITY)
+        target_y = int(index_tip.y * screen_h * SENSITIVITY)
+        target_x = max(0, min(screen_w - 1, target_x))
+        target_y = max(0, min(screen_h - 1, target_y))
+
+        # Smooth
+        prev_x_list.append(target_x)
+        prev_y_list.append(target_y)
+        if len(prev_x_list) > SMOOTHING:
+            prev_x_list.pop(0)
+            prev_y_list.pop(0)
+
+        smooth_x = int(sum(prev_x_list) / len(prev_x_list))
+        smooth_y = int(sum(prev_y_list) / len(prev_y_list))
+
+        pyautogui.moveTo(smooth_x, smooth_y)
+
+        status = "CLICKING" if pinch_active else "moving"
+        cv2.putText(frame, f"{status}  cursor:({smooth_x},{smooth_y})",
+                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.65, dot_color, 2)
+        cv2.putText(frame, f"pinch dist: {pinch_dist:.0f}px",
+                    (10, 58), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+
+    else:
+        prev_x_list.clear()
+        prev_y_list.clear()
+        pinch_active = False
+        cv2.putText(frame, "No hand detected",
+                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+    cv2.imshow("Virtual Mouse  |  Q to quit", frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+landmarker.close()
+print("Stopped.")
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#rps.py
+"""
+Rock Paper Scissors  -  OpenCV only (no MediaPipe)
+Gesture logic (pure finger count):
+  0 fingers  ->  Rock     (closed fist)
+  2 fingers  ->  Scissors (index + middle up)
+  4-5 fingers -> Paper    (open palm)
+Tubelight / fluorescent lighting optimised.
+"""
+
+import cv2
+import numpy as np
+import random
+import time
+from collections import Counter
+
+
+# ─── Tubelight-optimised enhancement ────────────────────────────────────────
+def enhance_frame(frame):
+    """
+    Bilateral filter  -> removes flicker noise, keeps hand edges sharp
+    CLAHE on L channel -> local contrast boost for flat fluorescent light
+    Sharpen kernel     -> restores edges for clean contour detection
+    """
+    smooth = cv2.bilateralFilter(frame, d=9, sigmaColor=75, sigmaSpace=75)
+
+    lab = cv2.cvtColor(smooth, cv2.COLOR_BGR2LAB)
+    l, a, b = cv2.split(lab)
+    clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
+    l = clahe.apply(l)
+    enhanced = cv2.merge([l, a, b])
+    enhanced = cv2.cvtColor(enhanced, cv2.COLOR_LAB2BGR)
+
+    kernel = np.array([[ 0, -1,  0],
+                       [-1,  5, -1],
+                       [ 0, -1,  0]], dtype=np.float32)
+    return cv2.filter2D(enhanced, -1, kernel)
+
+
+# ─── Skin mask (YCrCb + HSV) ─────────────────────────────────────────────────
+def skin_mask(frame):
+    ycrcb = cv2.cvtColor(frame, cv2.COLOR_BGR2YCrCb)
+    mask_y = cv2.inRange(ycrcb,
+                         np.array([0,  133,  77], dtype=np.uint8),
+                         np.array([255, 173, 127], dtype=np.uint8))
+
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    mask_h1 = cv2.inRange(hsv,
+                          np.array([0,  20,  60], dtype=np.uint8),
+                          np.array([25, 255, 255], dtype=np.uint8))
+    mask_h2 = cv2.inRange(hsv,
+                          np.array([170, 20, 60], dtype=np.uint8),
+                          np.array([180, 255, 255], dtype=np.uint8))
+
+    mask = cv2.bitwise_or(mask_y, cv2.bitwise_or(mask_h1, mask_h2))
+
+    k_open  = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    k_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN,  k_open,  iterations=2)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k_close, iterations=3)
+    mask = cv2.GaussianBlur(mask, (5, 5), 0)
+    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+    return mask
+
+
+def largest_contour(mask, min_area=6000):
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL,
+                                   cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return None
+    cnt = max(contours, key=cv2.contourArea)
+    return cnt if cv2.contourArea(cnt) > min_area else None
+
+
+# ─── Finger counter (fixed) ──────────────────────────────────────────────────
+def count_fingers(cnt):
+    """
+    Counts extended fingers using convexity defects.
+
+    KEY FIX vs previous version:
+      Old code always did  `fingers + 1`  so a fist returned 1 instead of 0.
+      New logic:
+        - 0 valid defects  ->  return 0  (fist / Rock)
+        - N valid defects  ->  return N + 1  (valleys between fingers)
+
+    Valley is valid when:
+      angle  < 90 deg  (sharp V between fingers)
+      depth  > 20 px   (deep enough to not be a knuckle bump)
+    """
+    hull_idx = cv2.convexHull(cnt, returnPoints=False)
+    if hull_idx is None or len(hull_idx) < 3:
+        return 0
+
+    try:
+        defects = cv2.convexityDefects(cnt, hull_idx)
+    except cv2.error:
+        return 0
+
+    if defects is None:
+        return 0   # no defects at all -> fist
+
+    valid_defects = 0
+    for i in range(defects.shape[0]):
+        s, e, f, d = defects[i, 0]
+        start = cnt[s][0]
+        end   = cnt[e][0]
+        far   = cnt[f][0]
+        depth = d / 256.0
+
+        a = np.linalg.norm(end   - start)
+        b = np.linalg.norm(far   - start)
+        c = np.linalg.norm(end   - far  )
+
+        if b == 0 or c == 0:
+            continue
+
+        cos_a = np.clip((b**2 + c**2 - a**2) / (2 * b * c), -1, 1)
+        angle = np.degrees(np.arccos(cos_a))
+
+        if angle < 90 and depth > 20:
+            valid_defects += 1
+
+    # THE FIX: only add 1 when there are actual valid defects
+    if valid_defects == 0:
+        return 0                            # closed fist
+    return min(valid_defects + 1, 5)        # valleys + 1 = finger count
+
+
+# ─── Gesture classification (pure finger count) ──────────────────────────────
+def classify(n_fingers):
+    """
+    0         ->  Rock
+    2         ->  Scissors
+    4 or 5    ->  Paper
+    anything else -> None (ambiguous, smoothing buffer handles it)
+    """
+    if n_fingers == 0:
+        return "Rock"
+    if n_fingers == 2:
+        return "Scissors"
+    if n_fingers in (4, 5):
+        return "Paper"
+    return None
+
+
+# ─── Game logic ──────────────────────────────────────────────────────────────
+CHOICES = ["Rock", "Paper", "Scissors"]
+BEATS   = {"Rock": "Scissors", "Paper": "Rock", "Scissors": "Paper"}
+
+def get_result(player, cpu):
+    if player == cpu:         return "Tie!"
+    if BEATS[player] == cpu:  return "You Win!  :)"
+    return                           "You Lose! :("
+
+
+# ─── Drawing helpers ─────────────────────────────────────────────────────────
+FONT = cv2.FONT_HERSHEY_DUPLEX
+
+def shadow_text(img, text, pos, scale, color, thick=2):
+    x, y = pos
+    cv2.putText(img, text, (x+2, y+2), FONT, scale, (0,0,0), thick+1, cv2.LINE_AA)
+    cv2.putText(img, text, (x,   y  ), FONT, scale, color,   thick,   cv2.LINE_AA)
+
+def pill(img, x1, y1, x2, y2, color, alpha=0.60):
+    ov = img.copy()
+    cv2.rectangle(ov, (x1, y1), (x2, y2), color, -1, cv2.LINE_AA)
+    cv2.addWeighted(ov, alpha, img, 1 - alpha, 0, img)
+
+
+# ─── ROI (place hand inside the green box) ───────────────────────────────────
+ROI_X1, ROI_Y1 = 80,  100
+ROI_X2, ROI_Y2 = 520, 540
+
+
+# ─── Main ────────────────────────────────────────────────────────────────────
+def main():
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH,  1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT,  720)
+
+    scores          = {"You": 0, "CPU": 0, "Tie": 0}
+    state           = "waiting"
+    countdown_start = 0.0
+    result_start    = 0.0
+    COUNTDOWN       = 3
+    RESULT_SHOW     = 2.5
+
+    cpu_choice    = None
+    player_choice = None
+    result_text   = ""
+
+    # Smoothing: majority vote over last 14 frames, need 60% agreement
+    gesture_buf = []
+    BUF  = 14
+    CONF = 0.60
+
+    show_mask  = False
+    show_debug = True   # live finger count display; press D to toggle
+
+    print("=" * 50)
+    print("  Rock Paper Scissors  -  Pure Finger Count")
+    print("  Gestures:")
+    print("    Fist          ->  Rock")
+    print("    2 fingers up  ->  Scissors")
+    print("    Open palm     ->  Paper")
+    print("  SPACE  -> start round")
+    print("  D      -> toggle finger-count debug")
+    print("  M      -> toggle skin mask view")
+    print("  R      -> reset scores | Q -> quit")
+    print("=" * 50)
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        frame = cv2.flip(frame, 1)
+        h, w  = frame.shape[:2]
+
+        # Enhance and detect
+        enhanced = enhance_frame(frame)
+        roi      = enhanced[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2]
+        mask_roi = skin_mask(roi)
+        cnt      = largest_contour(mask_roi)
+
+        raw_gesture = None
+        n_fing      = 0
+
+        if cnt is not None:
+            cnt_shifted = cnt + np.array([ROI_X1, ROI_Y1])
+            cv2.drawContours(frame, [cnt_shifted], -1, (0, 255, 100), 2)
+            hull_pts = cv2.convexHull(cnt_shifted)
+            cv2.polylines(frame, [hull_pts], True, (255, 200, 0), 2)
+
+            n_fing      = count_fingers(cnt)
+            raw_gesture = classify(n_fing)
+
+        # Skin mask debug overlay
+        if show_mask:
+            full_mask = np.zeros((h, w), dtype=np.uint8)
+            full_mask[ROI_Y1:ROI_Y2, ROI_X1:ROI_X2] = mask_roi
+            mc = cv2.cvtColor(full_mask, cv2.COLOR_GRAY2BGR)
+            frame = cv2.addWeighted(frame, 0.6, mc, 0.4, 0)
+
+        # Smoothing buffer
+        if raw_gesture:
+            gesture_buf.append(raw_gesture)
+        if len(gesture_buf) > BUF:
+            gesture_buf.pop(0)
+
+        stable_gesture = None
+        if gesture_buf:
+            top, freq = Counter(gesture_buf).most_common(1)[0]
+            if freq / len(gesture_buf) >= CONF:
+                stable_gesture = top
+
+        now = time.time()
+
+        # ──────────────────── UI ─────────────────────────────────────────
+
+        # ROI box
+        roi_color = (0, 255, 100) if stable_gesture else (60, 140, 60)
+        cv2.rectangle(frame, (ROI_X1, ROI_Y1), (ROI_X2, ROI_Y2),
+                      roi_color, 2, cv2.LINE_AA)
+        cv2.putText(frame, "Place hand here", (ROI_X1, ROI_Y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, roi_color, 1, cv2.LINE_AA)
+
+        # Header bar
+        pill(frame, 0, 0, w, 75, (15, 15, 15), 0.80)
+        shadow_text(frame, "ROCK  PAPER  SCISSORS",
+                    (w // 2 - 240, 52), 1.3, (255, 220, 50), 2)
+
+        # Score bar
+        pill(frame, 0, h - 55, w, h, (15, 15, 15), 0.80)
+        shadow_text(frame,
+            f"  You: {scores['You']}      Tie: {scores['Tie']}      CPU: {scores['CPU']}  ",
+            (w // 2 - 230, h - 15), 0.85, (180, 255, 180), 2)
+
+        # TL boost label
+        cv2.putText(frame, "TL-BOOST ON", (w - 160, 65),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.50, (100, 255, 100), 1, cv2.LINE_AA)
+
+        # Finger count debug badge
+        if show_debug and cnt is not None:
+            pill(frame, ROI_X2 + 10, ROI_Y1, ROI_X2 + 220, ROI_Y1 + 60,
+                 (20, 20, 50), 0.80)
+            shadow_text(frame, f"Fingers : {n_fing}",
+                        (ROI_X2 + 18, ROI_Y1 + 36), 0.80, (200, 200, 255))
+
+        # ── WAITING ──────────────────────────────────────────────────────
+        if state == "waiting":
+            if stable_gesture:
+                pill(frame, ROI_X1, ROI_Y2 + 8, ROI_X2, ROI_Y2 + 52,
+                     (0, 70, 0), 0.75)
+                shadow_text(frame, f"Gesture: {stable_gesture}",
+                            (ROI_X1 + 10, ROI_Y2 + 40), 0.85, (80, 255, 80))
+
+            pill(frame, w//2-290, h//2-60, w//2+290, h//2+65, (20,20,20), 0.75)
+            shadow_text(frame, "Show hand in box, then press SPACE",
+                        (w//2-275, h//2-15), 0.80, (210, 210, 210))
+            shadow_text(frame, "D = debug   M = mask   R = reset   Q = quit",
+                        (w//2-265, h//2+42), 0.68, (150, 150, 150))
+
+        # ── COUNTDOWN ────────────────────────────────────────────────────
+        elif state == "countdown":
+            elapsed   = now - countdown_start
+            remaining = COUNTDOWN - elapsed
+
+            if remaining <= 0:
+                player_choice = stable_gesture or "Rock"
+                cpu_choice    = random.choice(CHOICES)
+                result_text   = get_result(player_choice, cpu_choice)
+
+                if   "Win"  in result_text: scores["You"] += 1
+                elif "Lose" in result_text: scores["CPU"] += 1
+                else:                       scores["Tie"] += 1
+
+                state        = "result"
+                result_start = now
+            else:
+                shadow_text(frame, str(int(remaining) + 1),
+                            (w//2-35, h//2+70), 5.5, (0, 220, 255), 6)
+                shadow_text(frame, "Get Ready!",
+                            (w//2-115, h//2-80), 1.4, (255, 220, 50))
+
+                if stable_gesture:
+                    pill(frame, ROI_X1, ROI_Y2+8, ROI_X2, ROI_Y2+52, (0,70,0), 0.75)
+                    shadow_text(frame, f"Locked: {stable_gesture}",
+                                (ROI_X1+10, ROI_Y2+40), 0.85, (80, 255, 80))
+                else:
+                    pill(frame, ROI_X1, ROI_Y2+8, ROI_X2, ROI_Y2+52, (70,0,0), 0.75)
+                    shadow_text(frame, "No hand detected!",
+                                (ROI_X1+10, ROI_Y2+40), 0.85, (100, 100, 255))
+
+        # ── RESULT ───────────────────────────────────────────────────────
+        elif state == "result":
+            if   "Win"  in result_text: rc = (80, 255, 100)
+            elif "Lose" in result_text: rc = (80, 100, 255)
+            else:                       rc = (255, 220,  50)
+
+            pill(frame, w//2-300, h//2-95, w//2+300, h//2+145, (20,20,20), 0.85)
+            shadow_text(frame, result_text,           (w//2-190, h//2-35),  1.6, rc, 3)
+            shadow_text(frame, f"You:  {player_choice}", (w//2-155, h//2+35), 1.0, (150,255,150))
+            shadow_text(frame, f"CPU:  {cpu_choice}",    (w//2-155, h//2+90), 1.0, (150,150,255))
+            shadow_text(frame, "SPACE to play again",    (w//2-155, h//2+132), 0.75, (180,180,180))
+
+            if now - result_start >= RESULT_SHOW:
+                state = "waiting"
+                gesture_buf.clear()
+
+        cv2.imshow("Rock Paper Scissors", frame)
+
+        key = cv2.waitKey(1) & 0xFF
+        if   key == ord('q'): break
+        elif key == ord('r'):
+            scores = {"You": 0, "CPU": 0, "Tie": 0}
+            state  = "waiting"
+            gesture_buf.clear()
+        elif key == ord('m'): show_mask  = not show_mask
+        elif key == ord('d'): show_debug = not show_debug
+        elif key == ord(' '):
+            if state == "waiting":
+                state           = "countdown"
+                countdown_start = now
+                gesture_buf.clear()
+            elif state == "result":
+                state = "waiting"
+                gesture_buf.clear()
+
+    cap.release()
+    cv2.destroyAllWindows()
+    print("\nFinal Scores ->",
+          f"You: {scores['You']}  |  Tie: {scores['Tie']}  |  CPU: {scores['CPU']}")
+
+
+if __name__ == "__main__":
+    main()
