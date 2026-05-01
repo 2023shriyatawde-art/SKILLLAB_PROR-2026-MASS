@@ -74,7 +74,8 @@ Virtual Mouse
 
 The project implements a computer vision-based system that enables mouse control through hand gestures, eliminating the need for a physical mouse.
 
-<img width="1600" height="1131" alt="image" src="https://github.com/user-attachments/assets/c64bfbd4-b3b7-43d9-83ad-c203a5aa11bc" />
+<img width="842" height="487" alt="01 05 2026_10 25 07_REC" src="https://github.com/user-attachments/assets/5270d6fa-92df-4dab-b410-846986120f38" />
+
 
 ## 1.4 One-Line Pitch
 
@@ -203,13 +204,51 @@ Include:
 - app interaction if any.
 
 **Response:**  
+The system works by using a camera to capture live video of the user’s hand and interpreting the hand gestures to control different functions.
+
+**Input:**  
+The primary input is the live video feed from a camera. The user performs hand gestures in front of the camera, which are captured frame by frame.
+
+**Processing:**  
+The captured video frames are processed using computer vision techniques. MediaPipe is used to detect hand landmarks, and these landmarks are analyzed by a gesture recognition module to identify specific gestures. Based on the detected gesture, the system either switches modes or performs an action. The system also applies smoothing and cooldown mechanisms to ensure stable and accurate operation.
+
+**Output:**  
+The output depends on the active mode. The system can control the mouse cursor, perform clicks, control media playback, toggle appliances, or trigger an emergency alert. Visual feedback is displayed on the screen, showing the current mode and detected gesture. Audio feedback is also provided for certain actions like SOS or appliance control.
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/49e0520c-9fc7-4195-bc33-9845fecbcc83" />
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/f673b17f-8bf8-4325-ae29-7dd8b7d98715" />
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/4a4bf15f-c64b-4745-a83c-00360b1cee86" />
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/58c05c9d-7121-462a-a89b-5e9eb75df0de" />
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/28bff787-b95f-458c-b919-bcff4d7cd7c1" />
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/436f9545-a377-4743-936d-b7865870c8b2" />
+
+
+**Physical Structure:**  
+The system consists of a camera connected to a computing device such as a Raspberry Pi 4 Model B or a laptop. The setup does not require complex hardware and operates using a simple camera-based interface.
+
+**App Interaction:**  
+The system does not rely on a dedicated mobile or web application. Instead, it directly interacts with the operating system using libraries to simulate mouse and keyboard inputs, allowing it to control existing applications such as media players.
 
 ## 5.3 Input / Output Map
 
-| System Part                              | Type            | What It Does                                                               |
-
-
----
+| System Part            | Type       | What It Does                                                                 |
+| ---------------------- | ---------- | ---------------------------------------------------------------------------- |
+| Camera (Webcam)        | Input      | Captures live video of the user’s hand gestures                              |
+| Hand Gestures          | Input      | Provides commands to control different modes and actions                     |
+| MediaPipe              | Processing | Detects hand landmarks from video frames                                     |
+| Gesture Recognizer     | Processing | Interprets landmarks to identify specific gestures                           |
+| Mode Controller        | Processing | Switches between modes like Mouse, Media, Appliance, and SOS                 |
+| Virtual Mouse Module   | Output     | Controls cursor movement and mouse clicks                                    |
+| Media Control Module   | Output     | Sends commands like play/pause, next, previous, volume control               |
+| Appliance Control      | Output     | Toggles appliance states like light and fan (simulated)                      |
+| SOS System             | Output     | Triggers emergency alert with audio feedback                                 |
+| Display Interface      | Output     | Shows camera feed, current mode, and detected gestures on screen             |
+| Audio Output (espeak)  | Output     | Provides voice feedback for actions like SOS and appliance control           |
 
 # 6. System Design, Sketches and Visual Planning 
 
@@ -324,22 +363,48 @@ Include:
 - reset behavior.
 
 **Response:**  
-`
 
-- **Sample Startup behavior:**  
-  The Raspi/FPGA initializes motor pins, PWM control, and starts a WiFi access point with a web server. The laptop initializes camera input, tracking system, and projection mapping.
-- **Input handling:**  
-  Movement commands are received from the laptop (pygame sends http requests)
-- **Sensor reading:**  
-  The camera continuously captures frames, and OpenCV detects ArUco markers to determine the car’s position and orientation.
-- **Decision logic:**  
-  The system maps the car’s position into a virtual coordinate system and checks for nearby obstacles or collisions. If movement is valid, the command is allowed; if not, it is blocked or replaced with a feedback action (like a slight shake).
-- **Output behavior:**  
-  The ESP32 drives the motors using PWM signals to control speed and direction. The projector displays the updated game environment, including obstacles, targets, and feedback visuals.
-- **Communication logic:**  
-  The laptop sends HTTP requests (e.g., `/forward`, `/left`) to the ESP32 over WiFi. The ESP32 parses these commands and executes motor actions.
-- **Reset behavior:**  
-  If no command is received within a short timeout, the ESP32 stops the motors. The game resets when a level is completed or restarted.`
+**Startup Behavior:**  
+When the program starts, the camera is initialized and configured for resolution and frame rate. MediaPipe Hands is initialized for real-time hand tracking. System variables such as mode, smoothing buffers, cooldown timers, and appliance states are also initialized. The default mode is set to "IDLE".
+
+**Input Handling:**  
+The system continuously captures frames from the camera. Each frame is flipped horizontally and converted to RGB format for processing. MediaPipe detects hand landmarks if a hand is present in the frame.
+
+**Sensor Reading / Data Extraction:**  
+If a hand is detected, landmark coordinates are extracted and converted into pixel values. These landmarks are passed to a gesture recognition module, which identifies the current gesture (e.g., OPEN_PALM, PEACE, PINCH, etc.).
+
+**Decision Logic:**  
+- The system first checks for mode-switching gestures (such as OPEN_PALM, PEACE, THUMBS_INDEX, SPIDERMAN, FIST).  
+- A cooldown mechanism ensures that modes are not switched repeatedly within a short time.  
+- Based on the detected gesture, the system switches to one of the modes: MOUSE, MEDIA, APPLIANCE, SOS, or IDLE.  
+
+Once a mode is active, further gestures are interpreted as actions specific to that mode.
+
+**Output Behavior:**  
+
+- **Virtual Mouse Mode:**  
+  The position of the index finger is mapped from camera coordinates to screen coordinates using interpolation. Cursor movement is smoothed using a moving average filter. Gestures such as PINCH and TWO_PINCH trigger left and right mouse clicks with cooldown control.
+
+- **Media Control Mode:**  
+  Gestures trigger keyboard media keys such as play/pause, next track, previous track, and volume control using the pynput library. A gesture lock prevents rapid repeated inputs.
+
+- **Appliance Control Mode:**  
+  Specific gestures toggle appliance states (light and fan). The system updates internal states and provides audio feedback using text-to-speech.
+
+- **SOS Mode:**  
+  A predefined gesture triggers an emergency alert. The system plays an audio message and visually highlights the screen to indicate the alert.
+
+- **Idle Mode:**  
+  No actions are performed, and the system waits for new input.
+
+**Communication Logic:**  
+The system interacts directly with the operating system using libraries such as pynput to simulate mouse and keyboard inputs. No external communication protocol is used.
+
+**Feedback System:**  
+Visual feedback is provided through an on-screen display showing the current mode, detected gesture, and appliance states. Audio feedback is generated using the espeak text-to-speech system for certain actions.
+
+**Reset Behavior:**  
+If no hand is detected for a certain duration, the system automatically returns to IDLE mode. Cooldown timers and gesture locks reset over time to allow new inputs.
 
 ## 8.3 Code Flowchart
 
