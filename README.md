@@ -250,7 +250,7 @@ The system does not rely on a dedicated mobile or web application. Instead, it d
 | Display Interface      | Output     | Shows camera feed, current mode, and detected gestures on screen             |
 | Audio Output (espeak)  | Output     | Provides voice feedback for actions like SOS and appliance control           |
 
-# 6. System Design, Sketches and Visual Planning 
+# 6. System Design, Sketches and Visual Planning (NOT APPLICABLE)
 
 ## 6.1 Concept Architecture/sketch/schematic
 
@@ -292,7 +292,7 @@ Add a sketch with labels showing:
 
 ---
 
-# 7. Electronics Planning
+# 7. Electronics Planning (NOT APPLICABLE)
 
 ## 7.1 Electronics Used
 
@@ -343,10 +343,7 @@ Insert a hand-drawn or software-made circuit diagram.
 
 | Tool / Platform                | Purpose                                        |
 | ------------------------------ | ---------------------------------------------- |
-| `[MicroPython]`                | `Control ESP32`                                |
 | `[Python/PyGame/OpenCV]`       | `Track markers, game logic, create projection` |
-| `[Fusion/Blender/Illustrator]` | `[Prototyping structure]`                      |
-|                                |                                                |
 
 ## 8.2 Software Logic/Algorithm
 
@@ -422,13 +419,11 @@ Suggested sequence:
 - error handling.
 
 **Insert image below:**  
-<img width="1600" height="1200" alt="image" src="" />
-<img width="1600" height="1200" alt="image" src="" />
+
+<img width="554" height="881" alt="image" src="https://github.com/user-attachments/assets/66508d45-e095-4177-860a-8a4a59f9610f" />
 
 
-
-
-# 9. Bill of Materials
+# 9. Bill of Materials (NOT APPLICABLE)
 
 ## 9.1 Full BOM
 
@@ -494,21 +489,24 @@ Include:
 
 ## 10.2 Task Breakdown
 
-| Task ID | Task                    | Owner    | Estimated Hours | Deadline     | Dependency | Status |
-| ------- | ----------------------- | -------- | ---------------:| ------------ | ---------- | ------ |
-| T1      | `[Finalize concept]`    | `[Both]` | `2`             | `1st April`  | `None`     | `Done` |
+## 10.2 Task Breakdown
 
+| Task ID | Task                                  |  Owner  | Estimated Time      | Dependency | Status    |
+| ------- | ------------------------------------- | ------- | --------------------|----------- |---------- |
+| T1      | Brainstorming & Finalizing concept    | ALL     |    15-20 min        | None       | Done      |  
+| T2      | Implement hand detection and gestures |         |    2 hrs            | T1         | Done      |
+| T3      | Develop all control modes             |         |    2 hrs            | T1         | Done      |
+| T4      | Integrate system and perform testing  |         |    1 hr             | T3         | Done      |
+| T5      | Documentation and flowchart creation  | SHRIYA  | Parallel with tasks | ALL        | Updating  |
 
 ## 10.3 Responsibility Split
 
 | Area                 | Main Owner     | Support Owner |
 | -------------------- | ----------     | ------------- |
-| Concept              | `[Mrugendra]`  | `[Jyoti]`     |
-| Electronics          | `[]`           | `[]`          |
+| Concept              | ALL            | ALL           |
 | Coding               | `[]`           | `[]`          |
-| Mechanical build     | `[]`           | `[]`          |
 | Testing              | `[]`           | `[]`          |
-| Documentation        | `[]`           | `[]`          |
+| Documentation        | Shriya         |  ALL          |
 
 ---
 
@@ -525,28 +523,26 @@ Expected outcomes:
 - [x] Sketches made
 - [x] BOM completed
 - [x] Purchase needs identified
-- [ ] Key uncertainty identified
+- [x] Key uncertainty identified
 - [x] Basic feasibility tested
 
 ### Bi Hour 2 — Build Subsystems
 
 Expected outcomes:
 
-- [x] Electronics tests completed
-- [ ] CAD / structure planning completed
-- [ ] App UI started if needed
-- [x] Mechanical concept tested
-- [x] Main subsystems partially working
+- [x] Camera and hand tracking tested
+- [x] Gesture detection implemented
+- [ ] UI design (Not applicable – minimal UI)
+- [x] Core modules partially working
 
 ### Bi Hour 3 — Integrate
 
 Expected outcomes:
 
-- [x] Physical body built
-- [x] Electronics integrated
-- [x] Code connected to hardware
-- [ ] App connected if required
-- [x] First playable version exists
+- [x] Modules integrated (mouse, media, appliance, SOS)
+- [x] Code connected and running
+- [ ] External app connection (Not applicable)
+- [x] First working version achieved
 
 ### Bi Hour 4 — Refine and Finish
 
@@ -557,15 +553,15 @@ Expected outcomes:
 - [x] Improvements made
 - [x] Documentation completed
 - [x] Final build ready
+      
+## 12.2  Update Log 
 
-## 12.2  Update Log
+## 12.2 Update Log
 
-| Days   | Planned Goal   | What Actually Happened | What Changed   | Next Steps     |
-| ------ | -------------- | ---------------------- | -------------- | -------------- |
-| Day 1 | `[Write here]` | `[Write here]`         | `[Write here]` | `[Write here]` |
-| Day 2 | `[Write here]` | `[Write here]`         | `[Write here]` | `[Write here]` |
-| Day 3 | `[Write here]` | `[Write here]`         | `[Write here]` | `[Write here]` |
-| Day 4 | `[Write here]` | `[Write here]`         | `[Write here]` | `[Write here]` |
+| Days  | Planned Goal                 | What Actually Happened        | What Changed                    | Next Steps             |
+| ----- | ---------------------------- | ----------------------------- | ------------------------------- | ---------------------- |
+| Day 1 | Build core system            | Implemented gesture modules   | Improved gesture accuracy       | Integrate modules      |
+| Day 2 | Integrate and finalize       | Completed testing and docs    | Added smoothing and cooldown    | Final review           |
 
 ---
 
@@ -580,10 +576,10 @@ Expected outcomes:
 
 ## 13.2 Biggest Unknown Right Now
 
-What is the single biggest uncertainty in your project at this stage?
+What is the single biggest uncertainty in your project at this stage
 
 **Response:**  
-
+The biggest uncertainty is the reliability of gesture recognition under different lighting conditions and backgrounds. Variations in environment and hand positioning can affect detection accuracy and may lead to inconsistent system behavior.
 
 ---
 
@@ -591,27 +587,35 @@ What is the single biggest uncertainty in your project at this stage?
 
 ## 14.1 Technical Testing Plan
 
-| What Needs Testing     | How You Will Test It                                                                 | Success Condition                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `[Wifi connection]`    | `[Check if motor spins via app button]`                                              | `[Both motors accurately respond to wifi signals]`                                                   |
-                       |
+| What Needs Testing        | How You Will Test It                          | Success Condition                         |
+| ------------------------ | --------------------------------------------- | ------------------------------------------ |
+| Hand detection           | Show hand to camera                           | Hand landmarks detected correctly          |
+| Gesture recognition      | Perform predefined gestures                   | Correct gesture is identified              |
+| Mode switching           | Use mode switch gestures                      | Mode changes accurately                    |
+| Mouse control            | Move hand and perform click gestures          | Cursor moves and clicks correctly          |
+| Media control            | Use media gestures                            | Media actions trigger correctly            |
+| Appliance control        | Perform ON/OFF gestures                       | Correct action is executed                 |
+| SOS detection            | Perform SOS gesture                           | Alert is triggered                         |                                                  
+                       
 ## 14.2 Testing and Debugging Log
 
-| Date          | Problem Found                         | Type         | What You Tried                                | Result               | Next Action                                    |
-| ------------- | ------------------------------------- | ------------ | --------------------------------------------- | -------------------- | ---------------------------------------------- |
-| `18th April`  | `Car not balancing properly`          | `Mechanical` | `Add low-friction caster support to one side` | `Worked`             | `improve caster structure`                     |
-
+| Date         | Problem Found                  | Type       | What You Tried                  | Result            | Next Action               |
+| ------------ | ------------------------------ | ---------- | ------------------------------- | ----------------- | ------------------------- |
+| 30th April   | Gesture not detected properly  | Technical  | Adjusted lighting and angles    | Improved          | Fine-tune thresholds      |
+| 30th April   | Multiple clicks triggered      | Logic      | Added cooldown delay            | Fixed             | Optimize timing           |
+| 30th April   | Cursor movement not smooth     | Performance| Added smoothing algorithm       | Improved          | Further optimize          |
 
 ## 14.3 Playtesting Notes
 
-| Tester      | What They Did                        | What Confused Them                    | What They Enjoyed                         | What You Will Change                          |
-| ----------- | ------------------------------------ | ------------------------------------- | ----------------------------------------- | --------------------------------------------- |
-| `Gopal` | `Tried navigating through obstacles` | `Some obstacles ewren't clear enough` | `Liked projection + real car interaction` | `Add a slight red highlight around obstacles` |
-
+| Tester   | What They Did                     | What Confused Them           | What They Enjoyed           | What You Will Change         |
+| -------- | -------------------------------- | ---------------------------- | --------------------------- | ---------------------------- |
+| User 1   | Tested mouse and gestures        | Some gestures hard to perform| Smooth cursor movement      | Simplify gestures            |
+| User 2   | Tested media control             | Mode switching unclear       | Easy media control          | Improve mode indication      |
+| ALL      | Tested full system               | Occasional misdetection      | Interactive experience      | Improve accuracy             |
 
 ---
 
-# 15. Build Documentation
+# 15. Build Documentation (NOT APPLICABLE)
 
 ## 15.1 Fabrication Process(if any)
 
@@ -669,13 +673,24 @@ Suggested images:
 Describe the final version of your project.
 
 **Response:**  
+The final system is a gesture-based virtual control platform developed using a webcam and computer vision techniques. It enables users to interact with their system using hand gestures without physical contact. The system supports multiple modes, including virtual mouse control, media control, appliance control, SOS detection, and a gesture-based rock–paper–scissors game. 
+
+Hand movements are captured through a camera, processed using MediaPipe for hand tracking, and interpreted into gestures. These gestures are mapped to specific actions such as cursor movement, clicking, media playback control, and triggering alerts. The system runs in real time and provides a smooth and interactive user experience.
 
 
 ## 17.2 What Works Well
-
+- Accurate hand detection and tracking  
+- Reliable gesture recognition for most predefined gestures  
+- Smooth cursor control with gesture-based clicks  
+- Proper mode switching between different functionalities  
+- Integration of multiple features into a single system  
 
 
 ## 17.3 What Still Needs Improvement
+- Performance under varying lighting conditions  
+- Gesture recognition consistency across different users  
+- Reduction of occasional false detections  
+- Improved feedback or visual indicators for active mode  
 
 
 ## 17.4 What Changed From the Original Plan
@@ -683,7 +698,7 @@ Describe the final version of your project.
 How did the project change from the initial idea?
 
 **Response:**  
-
+The initial idea focused on a basic gesture-controlled system. During development, the project was expanded to include multiple modes such as media control, appliance control, and SOS detection. Additionally, a gesture-based rock–paper–scissors game was added to enhance interactivity. The final system became more feature-rich and integrated compared to the original plan.
 
 ---
 
@@ -696,6 +711,11 @@ What slowed you down?
 How well did you manage time, tasks, and responsibilities?
 
 **Response:**  
+The team worked well in terms of clear role distribution and effective collaboration. Each member contributed to their respective areas, with coding, testing, and documentation handled efficiently. Communication within the team was consistent, which helped in quick decision-making and problem-solving during development.
+
+One of the main challenges was managing gesture accuracy and ensuring smooth integration of multiple features within limited time. Debugging and fine-tuning the system took longer than expected, especially while handling real-time performance issues.
+
+Overall, time and tasks were managed effectively within the hackathon constraints. The team was able to prioritize core functionalities first and then gradually add additional features. Responsibilities were handled properly, and coordination between members ensured that the project was completed successfully within the given time.
 
 
 ## 18.2 Technical Reflection
@@ -709,6 +729,15 @@ What did you learn about:
 - integration?
 
 **Response:**  
+Through this project, we gained practical understanding across multiple technical areas.
+
+In electronics, we learned how to interface and utilize a Raspberry Pi for real-time applications, including handling camera input and system-level interactions.
+
+In coding, we developed strong skills in Python, especially using libraries such as OpenCV and MediaPipe for computer vision. We learned how to implement gesture recognition, apply smoothing techniques, and manage real-time processing with efficient logic.
+
+Mechanisms and fabrication were not a primary focus in this project, as the system was software-oriented and did not involve physical structures.
+
+In integration, we learned how to combine multiple modules—such as gesture detection, mode switching, and different control functionalities—into a single cohesive system. Ensuring that all components worked together smoothly in real time was a key learning outcome.
 
 
 ## 18.3 Design Reflection
@@ -723,18 +752,38 @@ What did you learn about:
 - iteration?
 
 **Response:**  
+We learned that designing a gesture-based system requires simplicity and clarity. Gestures must be easy to perform and clearly mapped to actions so users can understand the system quickly.
+
+User delight comes from smooth and responsive performance. Stable cursor movement and quick response improve the overall experience.
+
+Clarity is important in indicating the current mode and system behavior to avoid confusion.
+
+Physical interaction through hand gestures highlighted the need for natural and comfortable movements.
+
+Iteration was essential, as multiple refinements were needed to improve accuracy, reduce errors, and enhance usability.
 
 
-## 18.4 If You Had One More hour
+## 18.3 Design Reflection
 
-What would you improve next?
+We learned that designing a gesture-based system requires simplicity and clarity. Gestures must be easy to perform and clearly mapped to actions so users can understand the system quickly.
 
-**Response:**  
+User delight comes from smooth and responsive performance. Stable cursor movement and quick response improve the overall experience.
 
-` `
+Clarity is important in indicating the current mode and system behavior to avoid confusion.
+
+Physical interaction through hand gestures highlighted the need for natural and comfortable movements.
+
+Iteration was essential, as multiple refinements were needed to improve accuracy, reduce errors, and enhance usability.
 
 ---
 
+## 18.4 What would you do if you had one more hour
+
+With one more hour, we would focus on improving gesture recognition accuracy and system stability. This includes refining thresholds, reducing false detections, and optimizing performance under different lighting conditions. We would also enhance user feedback by adding clearer visual indicators for active modes.
+
+
+
+---
 # 19. Final Submission Checklist
 
 Before submission, confirm that:
@@ -742,16 +791,16 @@ Before submission, confirm that:
 - [x] Team details are complete
 - [x] Project description is complete
 - [x] Inspiration sources are included
-- [x] Sketches are added
+- [ ] Sketches are added
 - [x] BOM is complete
-- [x] Purchase list is complete
-- [x] Budget summary is complete
-- [x] Mechanical planning is documented if applicable
+- [ ] Purchase list is complete
+- [ ] Budget summary is complete
+- [ ] Mechanical planning is documented if applicable
 - [ ] App planning is documented if applicable
 - [x] Code flowchart is added
 - [x] Task breakdown is complete
-- [x] Weekly logs are updated
-- [x] Risk register is complete
+- [ ] Weekly logs are updated
+- [ ] Risk register is complete
 - [x] Testing log is updated
 - [x] Playtesting notes are included
 - [x] Build photos are included
