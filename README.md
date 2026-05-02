@@ -248,7 +248,6 @@ The system does not rely on a dedicated mobile or web application. Instead, it d
 | Appliance Control      | Output     | Toggles appliance states like light and fan (simulated)                      |
 | SOS System             | Output     | Triggers emergency alert with audio feedback                                 |
 | Display Interface      | Output     | Shows camera feed, current mode, and detected gestures on screen             |
-| Audio Output (espeak)  | Output     | Provides voice feedback for actions like SOS and appliance control           |
 
 # 6. System Design, Sketches and Visual Planning (NOT APPLICABLE)
 
@@ -283,7 +282,7 @@ Add a sketch with labels showing:
 <img width="1326" height="1600" alt="image" src="https://github.com/user-attachments/assets/ba86d49c-e3bc-43a4-a25c-53d92d36bc09" />
 
 
-## 6.3 Approximate Dimensions
+## 6.3 Approximate Dimensions (NOT APPLICABLE)
 
 | Dimension        | Value   |
 | ---------------- | ------- |
@@ -573,13 +572,14 @@ Expected outcomes:
 
 ## 13.1 Risk Register
 
-                                                                                                                                                                  |          Risk                   | Owner               | Type     |  Likelihood  | Impact     | Mitigation Plan                                              |
-| --------------------------------|---------------------|--------- | ------------ | ---------- | -------------------------------------------------------------|
-|Mediapipe only works on python.11| Mitesh              |Technical |              |Medium      | Version control
-|Integration of tkinter           | Aryamaan            |Technical |              |Medium      | Modular testing
-|rps gesture mode accuracy        | Satvik              |Technical |              |Medium      | Buffer smoothing
-|Virtual mouse smoothing          | Satvik              |Technical |              |Medium      | Adjust smoothing
+| Risk                            | Owner    | Type      | Likelihood | Impact | Mitigation Plan  |
+| ------------------------------- | -------- | --------- | ---------- | ------ | ---------------- |
+| Mediapipe version compatibility | Mitesh   | Technical | Medium     | Medium | Version control  |
+| Integration of Tkinter          | Aryamaan | Technical | Medium     | Medium | Modular testing  |
+| RPS gesture mode accuracy       | Satvik   | Technical | Medium     | Medium | Buffer smoothing |
+| Virtual mouse smoothing         | Satvik   | Technical | Medium     | Medium | Adjust smoothing |
 
+                                                                                                                                                                  
 
 ## 13.2 Biggest Unknown Right Now
 
