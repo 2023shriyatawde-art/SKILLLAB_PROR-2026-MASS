@@ -279,7 +279,9 @@ Add a sketch with labels showing:
 
 **Insert image below:**  
 `[Upload image and link here]`
-<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/95637f31-b4e7-4427-a9e1-4b63fbeb0ac5" />
+
+<img width="1326" height="1600" alt="image" src="https://github.com/user-attachments/assets/ba86d49c-e3bc-43a4-a25c-53d92d36bc09" />
+
 
 ## 6.3 Approximate Dimensions
 
@@ -420,7 +422,9 @@ Suggested sequence:
 
 **Insert image below:**  
 
-<img width="554" height="881" alt="image" src="https://github.com/user-attachments/assets/66508d45-e095-4177-860a-8a4a59f9610f" />
+
+<img width="758" height="1041" alt="flowchart26 drawio (1)" src="https://github.com/user-attachments/assets/e111ad2d-6f3c-4c48-a33d-393713aaef58" />
+
 
 
 # 9. Bill of Materials (NOT APPLICABLE)
@@ -494,18 +498,18 @@ Include:
 | Task ID | Task                                  |  Owner  | Estimated Time      | Dependency | Status    |
 | ------- | ------------------------------------- | ------- | --------------------|----------- |---------- |
 | T1      | Brainstorming & Finalizing concept    | ALL     |    15-20 min        | None       | Done      |  
-| T2      | Implement hand detection and gestures |         |    2 hrs            | T1         | Done      |
-| T3      | Develop all control modes             |         |    2 hrs            | T1         | Done      |
-| T4      | Integrate system and perform testing  |         |    1 hr             | T3         | Done      |
+| T2      | Implement hand detection and gestures | ARYAMAAN|    2 hrs            | T1         | Done      |
+| T3      | Develop all control modes             | SATVIK  |    2 hrs            | T1         | Done      |
+| T4      | Integrate system and perform testing  | MITESH  |    2 hs             | T3         | Done      |
 | T5      | Documentation and flowchart creation  | SHRIYA  | Parallel with tasks | ALL        | Updating  |
 
 ## 10.3 Responsibility Split
 
 | Area                 | Main Owner     | Support Owner |
 | -------------------- | ----------     | ------------- |
-| Concept              | ALL            | ALL           |
-| Coding               | `[]`           | `[]`          |
-| Testing              | `[]`           | `[]`          |
+| Concept              | Aryamaan       | Satvik        |
+| Coding               | Satvik         | Mitesh        |
+| Testing              | Mitesh         | Aryamaan      |
 | Documentation        | Shriya         |  ALL          |
 
 ---
@@ -520,9 +524,9 @@ Expected outcomes:
 
 - [x] Idea finalized
 - [x] Core interaction decided
-- [x] Sketches made
-- [x] BOM completed
-- [x] Purchase needs identified
+- [ ] Sketches made
+- [ ] BOM completed
+- [ ] Purchase needs identified
 - [x] Key uncertainty identified
 - [x] Basic feasibility tested
 
@@ -532,7 +536,7 @@ Expected outcomes:
 
 - [x] Camera and hand tracking tested
 - [x] Gesture detection implemented
-- [ ] UI design (Not applicable – minimal UI)
+- [x] UI design (Not applicable – minimal UI)
 - [x] Core modules partially working
 
 ### Bi Hour 3 — Integrate
@@ -569,9 +573,11 @@ Expected outcomes:
 
 ## 13.1 Risk Register
 
-| Risk                                                            | Type         | Likelihood | Impact   | Mitigation Plan                                                                       | Owner                |
-| --------------------------------------------------------------- | ------------ | ---------- | -------- | ------------------------------------------------------------------------------------- | -------------------- |
-| WiFi connection between laptop and ESP32 becomes unstable       | `Technical`  | `Medium`   | `High`   | Keep ESP32 close, ensure stable power supply, reduce network load, add fail-safe stop | `[Gopal]`           |
+                                                                                                                                                                  |          Risk                   | Owner               | Type     |  Likelihood  | Impact     | Mitigation Plan                                              |
+| --------------------------------|---------------------|--------- | ------------ | ---------- | -------------------------------------------------------------|
+|Mediapipe only works on python.11|
+|Integration of tkinter           |
+|rps gesture mode accuracy        |
 
 
 ## 13.2 Biggest Unknown Right Now
@@ -615,9 +621,9 @@ The biggest uncertainty is the reliability of gesture recognition under differen
 
 ---
 
-# 15. Build Documentation (NOT APPLICABLE)
+# 15. Build Documentation 
 
-## 15.1 Fabrication Process(if any)
+## 15.1 Fabrication Process(if any) (NOT APPLICABLE)
 
 Describe how the project was physically made.
 
