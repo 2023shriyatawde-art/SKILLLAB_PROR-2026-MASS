@@ -501,7 +501,7 @@ Include:
 | T2      | Implement hand detection and gestures | ARYAMAAN|    2 hrs            | T1         | Done      |
 | T3      | Develop all control modes             | SATVIK  |    2 hrs            | T1         | Done      |
 | T4      | Integrate system and perform testing  | MITESH  |    2 hs             | T3         | Done      |
-| T5      | Documentation and flowchart creation  | SHRIYA  | Parallel with tasks | ALL        | Updating  |
+| T5      | Documentation and System Design       | SHRIYA  | Parallel with tasks | ALL        | Updating  |
 
 ## 10.3 Responsibility Split
 
