@@ -501,7 +501,7 @@ Include:
 | T2      | Implement hand detection and gestures | ARYAMAAN|    2 hrs            | T1         | Done      |
 | T3      | Develop all control modes             | SATVIK  |    2 hrs            | T1         | Done      |
 | T4      | Integrate system and perform testing  | MITESH  |    2 hs             | T3         | Done      |
-| T5      | Documentation and System Design       | SHRIYA  | Parallel with tasks | ALL        | Updating  |
+| T5      | Documentation and System Design       | SHRIYA  | Parallel with tasks | ALL        | Updated  |
 
 ## 10.3 Responsibility Split
 
@@ -575,9 +575,10 @@ Expected outcomes:
 
                                                                                                                                                                   |          Risk                   | Owner               | Type     |  Likelihood  | Impact     | Mitigation Plan                                              |
 | --------------------------------|---------------------|--------- | ------------ | ---------- | -------------------------------------------------------------|
-|Mediapipe only works on python.11|
-|Integration of tkinter           |
-|rps gesture mode accuracy        |
+|Mediapipe only works on python.11| Mitesh              |Technical |              |Medium      | Version control
+|Integration of tkinter           | Aryamaan            |Technical |              |Medium      | Modular testing
+|rps gesture mode accuracy        | Satvik              |Technical |              |Medium      | Buffer smoothing
+|Virtual mouse smoothing          | Satvik              |Technical |              |Medium      | Adjust smoothing
 
 
 ## 13.2 Biggest Unknown Right Now
@@ -613,11 +614,11 @@ The biggest uncertainty is the reliability of gesture recognition under differen
 
 ## 14.3 Playtesting Notes
 
-| Tester   | What They Did                     | What Confused Them           | What They Enjoyed           | What You Will Change         |
-| -------- | -------------------------------- | ---------------------------- | --------------------------- | ---------------------------- |
-| User 1   | Tested mouse and gestures        | Some gestures hard to perform| Smooth cursor movement      | Simplify gestures            |
-| User 2   | Tested media control             | Mode switching unclear       | Easy media control          | Improve mode indication      |
-| ALL      | Tested full system               | Occasional misdetection      | Interactive experience      | Improve accuracy             |
+| Tester           | What They Did                    | What Confused Them           | What They Enjoyed           | What You Will Change         |
+| -----------------| -------------------------------- | ---------------------------- | --------------------------- | ---------------------------- |
+| Satvik, Mitesh   | Tested mouse and gestures        | Some gestures hard to perform| Smooth cursor movement      | Simplify gestures            |
+| Mitesh, Aryaman  | Tested media control             | Mode switching unclear       | Easy media control          | Improve mode indication      |
+| Shriya, Aryamaan | Tested full system               | Occasional misdetection      | Interactive experience      | Improve accuracy             |
 
 ---
 
@@ -666,10 +667,34 @@ Suggested images:
 - mechanism test,
 - app screenshot,
 - final build.
-- <img width="960" height="1280" alt="WhatsApp Image 2026-04-24 at 9 46 02 AM (1)" src="https://github.com/user-attachments/assets/74baa570-5770-483e-be6d-d2f03386e37c" />
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a5ee51e3-a7bf-4408-88e7-c74832bfd16a" />
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/4f405f1d-08b6-473f-8f68-29fbdb4d9909" />
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a66d58ac-e452-41f5-84ba-b179834df288" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/6a00c0f5-f921-4218-9ba3-4cb64f49bd48" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/3e5450cd-f497-4cd0-a2f3-62f4f9de6393" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/3a1206ab-15e2-4872-a975-76d77af342d3" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/7d9ad410-e976-4708-8e1e-9778050821af" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/94af97f3-ffe1-41d6-b11b-e9fdde6ebdd7" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/0ca833a6-4f7e-417a-a624-fc23b0bd6d9d" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/a7e4c672-8c82-4f2a-9dd8-6b1f4b01b8fe" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/814d92cd-e523-4c2b-937f-f0de73b9ed0b" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/9ecc07ef-8965-458f-a33f-a3ae6b61db1a" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/63862041-c189-4538-b790-3fed3909dfa6" />
+
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/96057855-a286-4fd6-ba0a-333c4bab1f5d" />
 
 
 # 17. Final Outcome
